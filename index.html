@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Image, Audio, and Text</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #6c63ff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #4e54f3;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        input[type="file"], input[type="text"] {
+            border: 2px solid #6c63ff;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+            cursor: pointer;
+            width: 50%; /* Adjust width for inputs */
+        }
+
+        button {
+            background-color: #6c63ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #5754e0;
+        }
+
+        #uploaded-images {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .uploaded_images {
+            display: flex;
+            justify-content: center; /* Align images in a row */
+            flex-wrap: wrap; /* Allow wrapping if the screen is too small */
+            margin-top: 20px;
+        }
+
+        #uploaded-images img {
+            max-width: 300px;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            width: 100%;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        h3 {
+            width: 100%;
+            text-align: center;
+            margin-top: 10px;
+            color: #4e54f3;
+        }
+
+        .audio-text-container {
+            display: flex;
+            justify-content: space-between; /* Align audio and text */
+            width: 100%; /* Full width */
+            margin-top: 15px; /* Space above */
+            margin-bottom: 10px;
+        }
+
+        audio {
+            margin-left: 15px; /* Space between text and audio */
+        }
+
+        .output-container {
+            margin-top: 20px; /* Space above each output */
+            text-align: center; /* Center-align the output text */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Upload Image, Audio, and Text</h1>
+    </header>
+    <form id="upload-form" enctype="multipart/form-data">
+        <label for="image">IMAGE</label><br>
+        <input type="file" name="image" accept="image/*" required>
+        <label for="audio">AUDIO</label><br>
+        <input type="file" name="audio" accept="audio/*" required>
+        <label for="text">TEXT</label><br>
+        <input type="text" name="text" placeholder="Enter some text" required>
+        <button type="submit">Upload</button>
+    </form>
+    <div id="uploaded-images"></div>
+    <script>
+        document.getElementById('upload-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            try {
+                const response = await fetch('/upload/', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                console.log(result); // Log the server response
+                if (response.ok) {
+                    const imagesDiv = document.getElementById('uploaded-images');
+                    imagesDiv.innerHTML = `
+                        <div class="output-container">
+                            <h3>Text :</h3>
+                            <p>${result.text}</p>
+                        </div>
+                        <div class="output-container">
+                            <h3>Uploaded Audio:</h3>
+                            <audio controls>
+                                <source src="${result.audio}" type="audio/mpeg">
+                                Your browser does not support the audio tag.
+                            </audio>
+                        </div>
+                        <div class="uploaded_images">
+                            <div class="output-container">
+                                <h3>Red Channel</h3>
+                                <img src="${result.red_image}" alt="Red Channel">
+                            </div>
+                            <div class="output-container">
+                                <h3>Green Channel</h3>
+                                <img src="${result.green_image}" alt="Green Channel">
+                            </div>
+                            <div class="output-container">
+                                <h3>Blue Channel</h3>
+                                <img src="${result.blue_image}" alt="Blue Channel">
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    console.error('Error:', result);
+                    alert('Error uploading files. Check console for details.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error uploading files. Check console for details.');
+            }
+        };
+    </script>
+</body>
+</html>
