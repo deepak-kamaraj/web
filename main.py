@@ -3,13 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from PIL import Image
 import os
-import pyttsx3
-
-say=pyttsx3.init()
-
-def speak(x):
-    say.say(x)
-    say.runAndWait()
+from googletrans import Translator
 
 app = FastAPI()
 
@@ -21,6 +15,9 @@ os.makedirs(MEDIA_DIR, exist_ok=True)
 
 # Mount the media directory to serve uploaded files
 app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
+
+# Initialize the translator
+translator = Translator()
 
 # Serve the HTML page directly
 @app.get("/", response_class=HTMLResponse)
@@ -36,7 +33,11 @@ async def upload_image(
     text: str = Form(...)
 ):
     print(f"Received text: {text}")  # Debug output for received text
-    speak(f"Your input text is {text}")
+
+    # Translate the input text to Hindi
+    translated = translator.translate(text, dest="hi")
+    translated_text = translated.text
+    print(f"Translated text to Hindi: {translated_text}")
 
     # Save the uploaded image to the 'media' directory
     img_path = os.path.join(MEDIA_DIR, image.filename)
@@ -87,12 +88,12 @@ async def upload_image(
     except Exception as e:
         return {"error": "Failed to save the uploaded audio."}
 
-    # Return the paths of the original and processed images and audio
+    # Return the paths of the original and processed images, audio, and translated text
     return {
         "original_image": f"/media/{image.filename}",
         "red_image": f"/media/red_{image.filename}",
         "green_image": f"/media/green_{image.filename}",
         "blue_image": f"/media/blue_{image.filename}",
         "audio": f"/media/{audio.filename}",
-        "text": text
+        "text": translated_text  # Return the translated text
     }
