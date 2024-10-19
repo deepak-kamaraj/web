@@ -7,42 +7,55 @@
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f4f4f9;
+            background-color: #f0f8ff;
             margin: 0;
             padding: 0;
         }
 
         header {
-            background-color: #6c63ff;
-            color: #fff;
+            background-color: #6a5acd;
+            color: white;
             padding: 20px;
             text-align: center;
-            border-bottom: 2px solid #4e54f3;
+            border-bottom: 3px solid #483d8b;
         }
 
         h1 {
             margin: 0;
+            font-size: 2rem;
+            letter-spacing: 1.5px;
         }
 
         form {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin: 20px 0;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            width: 60%;
+            margin: 0 auto;
+        }
+
+        label {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            color: #333;
         }
 
         input[type="file"], input[type="text"] {
-            border: 2px solid #6c63ff;
+            border: 2px solid #6a5acd;
             border-radius: 5px;
             padding: 10px;
-            margin: 10px 0;
             font-size: 16px;
-            cursor: pointer;
-            width: 50%; /* Adjust width for inputs */
+            margin-bottom: 10px;
+            width: 80%;
         }
 
-        button {
-            background-color: #6c63ff;
+        .upload-btn {
+            background-color: #6a5acd;
             color: white;
             border: none;
             border-radius: 5px;
@@ -50,10 +63,11 @@
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s;
+            margin-bottom: 20px;
         }
 
-        button:hover {
-            background-color: #5754e0;
+        .upload-btn:hover {
+            background-color: #483d8b;
         }
 
         #uploaded-images {
@@ -65,8 +79,8 @@
 
         .uploaded_images {
             display: flex;
-            justify-content: center; /* Align images in a row */
-            flex-wrap: wrap; /* Allow wrapping if the screen is too small */
+            justify-content: center;
+            flex-wrap: wrap;
             margin-top: 20px;
         }
 
@@ -78,33 +92,43 @@
         }
 
         h2 {
-            width: 100%;
             text-align: center;
             margin-top: 20px;
         }
 
         h3 {
-            width: 100%;
             text-align: center;
             margin-top: 10px;
-            color: #4e54f3;
+            color: #6a5acd;
         }
 
         .audio-text-container {
             display: flex;
-            justify-content: space-between; /* Align audio and text */
-            width: 100%; /* Full width */
-            margin-top: 15px; /* Space above */
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 15px;
             margin-bottom: 10px;
         }
 
         audio {
-            margin-left: 15px; /* Space between text and audio */
+            margin-left: 15px;
         }
 
         .output-container {
-            margin-top: 20px; /* Space above each output */
-            text-align: center; /* Center-align the output text */
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .upload-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .upload-section {
+            margin-bottom: 20px;
+            width: 100%;
+            text-align: center;
         }
     </style>
 </head>
@@ -113,15 +137,29 @@
         <h1>Upload Image, Audio, and Text</h1>
     </header>
     <form id="upload-form" enctype="multipart/form-data">
-        <label for="image">IMAGE</label><br>
-        <input type="file" name="image" accept="image/*" required>
-        <label for="audio">AUDIO</label><br>
-        <input type="file" name="audio" accept="audio/*" required>
-        <label for="text">TEXT</label><br>
-        <input type="text" name="text" placeholder="Enter some text" required>
-        <button type="submit">Upload</button>
+        <div class="upload-container">
+            <div class="upload-section">
+                <label for="image">Upload Image</label><br>
+                <input type="file" name="image" accept="image/*" required>
+                <button class="upload-btn">Upload Image</button>
+            </div>
+            
+            <div class="upload-section">
+                <label for="audio">Upload Audio</label><br>
+                <input type="file" name="audio" accept="audio/*" required>
+                <button class="upload-btn">Upload Audio</button>
+            </div>
+            
+            <div class="upload-section">
+                <label for="text">Enter Text</label><br>
+                <input type="text" name="text" placeholder="Enter some text" required>
+                <button class="upload-btn">Submit Text</button>
+            </div>
+        </div>
     </form>
+
     <div id="uploaded-images"></div>
+
     <script>
         document.getElementById('upload-form').onsubmit = async (e) => {
             e.preventDefault();
@@ -133,11 +171,12 @@
                 });
                 const result = await response.json();
                 console.log(result); // Log the server response
+
                 if (response.ok) {
                     const imagesDiv = document.getElementById('uploaded-images');
                     imagesDiv.innerHTML = `
                         <div class="output-container">
-                            <h3>Text :</h3>
+                            <h3>Translated Text (Hindi):</h3>
                             <p>${result.text}</p>
                         </div>
                         <div class="output-container">
